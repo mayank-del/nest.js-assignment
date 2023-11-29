@@ -26,9 +26,9 @@ export class TaskService {
         'Incorrect password!',
         HttpStatus.UNAUTHORIZED,
       );
-      console.log(user.id);
+      //console.log();
       
-      const token=jwt.sign({id:user.id,uname:user.member_name},"mayank_secret", { expiresIn: '1h' });
+      const token=jwt.sign({id:user.id,uname:user.member_name},process.env.SECRET, { expiresIn: '1h' });
     return {message:"login successfully!",token:token}
   }
   createTeamMember(createTaskDetails:CreateTeamMember) {
