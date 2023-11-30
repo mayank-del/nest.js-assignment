@@ -7,6 +7,7 @@ import { TasksModule } from './task/tasks.module';
 import { TaskController } from './task/controllers/task/task.controller';
 import { TaskService } from './task/services/task/task.service';
 import { Team_member } from './typeorm/entities/Team_member';
+import { Team } from './typeorm/entities/Team';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { Team_member } from './typeorm/entities/Team_member';
       username: 'root',
       password: 'root',
       database: 'pract',
-      entities: [Task,Team_member],
+      entities: [Task,Team_member,Team],
       synchronize: true,
     }),
     TasksModule,

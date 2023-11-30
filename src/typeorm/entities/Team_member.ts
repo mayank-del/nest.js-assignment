@@ -2,9 +2,11 @@ import {
     Column,
     Entity,
     OneToMany,
+    ManyToOne,
     PrimaryGeneratedColumn,
   } from 'typeorm';
 import { Task } from './Task';
+import { Team } from './Team';
   //import { Post } from './Post';
   //import { Profile } from './Profile';
   
@@ -21,6 +23,9 @@ import { Task } from './Task';
   
     @OneToMany(()=>Task,(task)=>task.member)
     tasks:Task[];
+
+    @ManyToOne(()=>Team,(team)=>team.members)
+    name_of_team:Team;
 
   }
   

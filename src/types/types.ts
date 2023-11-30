@@ -18,3 +18,8 @@ export type CreateTeamMember={
     member_name: string;
     password: string;
 }
+
+export type CreateTeam={
+    team_name: string;
+    
+}
