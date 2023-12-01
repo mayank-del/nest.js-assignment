@@ -17,7 +17,7 @@ export class ApiTokenCheckMiddleware implements NestMiddleware {
         if (decoded) next();
         else {
           //res.status(401);
-          res.status(498).send('you are not authorized.');
+          res.status(498).send("It's not a valid token.");
         }
       } catch (e) {
         res.status(498).send(e.message);
