@@ -14,6 +14,11 @@ export class ApiTokenCheckMiddleware implements NestMiddleware {
         token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.SECRET);
         //console.log(decoded);
+        req["tokenData"]=decoded;
+        
+        //req["unique_name"]=decoded["uname"];
+       
+
         if (decoded) next();
         else {
           //res.status(401);

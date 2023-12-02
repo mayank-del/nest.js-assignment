@@ -6,6 +6,7 @@ import { CreateTaskParams, UpdateTaskParams,CreateTeamMember,CreateTeam } from '
 import { Team_member } from 'src/typeorm/entities/Team_member';
 import * as jwt from 'jsonwebtoken';
 import { Team } from 'src/typeorm/entities/Team';
+import {Response} from "express";
 //import { UpdateTaskDto } from 'src/task/dtos/UpdateUser.dto';
 
 @Injectable()
@@ -35,11 +36,19 @@ export class TaskService {
   }
   async createTeamMember(id: number, createTeamMemberDetails:CreateTeamMember) {
     const name_of_team = await this.teamRepository.findOneBy({ id });
+    
+    
     if (!name_of_team)
-      throw new HttpException(
-        'User not found. Cannot create Profile',
-        HttpStatus.BAD_REQUEST,
-      );
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'Team not found in database. First create team then add member',
+      };
+    const mem=await this.teamMemberRepository.findOneBy({member_name:createTeamMemberDetails.member_name})  
+    if (mem)
+      return {
+        status: HttpStatus.CONFLICT,
+        message: 'Member with this name already exists',
+      };
     const newPost = this.teamMemberRepository.create({
       ...createTeamMemberDetails,
       name_of_team,
@@ -71,15 +80,20 @@ export class TaskService {
     return this.taskRepository.save(newTasks);
   } */
   async createTasks(
+    
     id: number,
     createTaskDetails: CreateTaskParams,
   ) {
     const member = await this.teamMemberRepository.findOneBy({ id });
     if (!member)
-      throw new HttpException(
-        'User not found. Cannot create Profile',
+    return {
+      status: HttpStatus.BAD_REQUEST,
+      message: 'User not found. Cannot create Task',
+    };
+      /* throw new HttpException(
+        'User not found. Cannot create Task',
         HttpStatus.BAD_REQUEST,
-      );
+      ); */
     const newPost = this.taskRepository.create({
       ...createTaskDetails,
       member,
@@ -95,10 +109,24 @@ export class TaskService {
   return this.teamRepository.save(newTeam);
   }
 
-  updateTaskById(id:number,UpdateTaskDetails:UpdateTaskParams){
-    this.taskRepository.update({id},{...UpdateTaskDetails})
+  async updateTaskById(id:number,UpdateTaskDetails:UpdateTaskParams){
+    const task = await this.taskRepository.findOneBy({ id });
+    if(!task)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'Task not found with that id. Cannot update Task',
+      };
+    return this.taskRepository.update({id},{...UpdateTaskDetails})
   }
-  deleteTaskById(id:number){
+  async deleteTaskById(id:number){
+    /* console.log(req);
+    let uid:number=req["id"] */
+    const task = await this.taskRepository.findOneBy({ id });
+    if(!task)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: 'Task not found with that id. Cannot delete Task',
+      };
     return this.taskRepository.delete({id})
   }
 }

@@ -1,4 +1,6 @@
 import {
+  Req,
+  Res,
   Param,
   Body,
   Controller,
@@ -6,8 +8,9 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Delete,
+  Delete
 } from '@nestjs/common';
+import {Request,Response} from "express";
 import { TaskService } from 'src/task/services/task/task.service';
 import { CreateTaskDto } from '../../dtos/CreateTask.dto';
 import { UpdateTaskDto } from 'src/task/dtos/UpdateUser.dto';
@@ -40,33 +43,52 @@ export class TaskController {
     return this.taskService.fetchTasksById(id);
   }
   @Post(':id/add/team_member')
-  createTeamMem(
+  async createTeamMem(
     @Param('id', ParseIntPipe) id: number,
     @Body() createTeamMemberDto: CreateTeamMember,
+    @Res() res: Response
   ) {
-    this.taskService.createTeamMember(id, createTeamMemberDto);
+    const status= await this.taskService.createTeamMember(id, createTeamMemberDto);
+    if ('status' in status) {
+      return res.status(status.status).json({ message: status.message });
+    }
+    return { message: status };
   }
 
-  @Post(':id/tasks')
+  @Post('/taskapi/tasks')
   async createNewTask(
-    @Param('id', ParseIntPipe) id: number,
+    //@Param('id', ParseIntPipe) id: number,
     @Body() createTaskDto: CreateTaskDto,
+   @Req() req: Request
+   
   ) {
-    const createdTask = await this.taskService.createTasks(id, createTaskDto);
+    const uid:number=req["tokenData"]["id"]
+    //const membername:string=req["tokenData"]["uname"]
+    //console.log(membername);
+    
+    const createdTask = await this.taskService.createTasks(uid, createTaskDto);
     return { message: 'Task created successfully', task: createdTask };
   }
 
-  @Patch(':id/tasks')
+  @Patch('/taskapi/tasks/:id')
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
+    @Res() res: Response
   ) {
-    await this.taskService.updateTaskById(id, updateTaskDto);
-    return { message: 'Task updated successfully' };
+    const status= await this.taskService.updateTaskById(id, updateTaskDto);
+    if ('status' in status) {
+      return res.status(status.status).json({ message: status.message });
+    }
+    return { message: status };
   }
-  @Delete(':id/tasks')
-  async deleteTask(@Param('id', ParseIntPipe) id: number) {
-    await this.taskService.deleteTaskById(id);
-    return { message: 'Task deleted successfully' };
+  @Delete('/taskapi/tasks/:id')
+  async deleteTask(@Param('id', ParseIntPipe) id: number,@Res() res: Response) {
+    
+    const status=await this.taskService.deleteTaskById(id);
+    if ('status' in status) {
+      return res.status(status.status).json({ message: status.message });
+    }
+    return { message: status };
   }
 }

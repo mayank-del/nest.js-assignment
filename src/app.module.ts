@@ -32,6 +32,6 @@ import {ApiTokenCheckMiddleware} from "./task/middlewares/verify-token"
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
       consumer.apply(ApiTokenCheckMiddleware)
-      .forRoutes("api/:id/tasks")
+      .forRoutes("api/taskapi/tasks")
   }
 }
